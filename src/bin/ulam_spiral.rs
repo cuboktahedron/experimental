@@ -2,27 +2,27 @@ use plotters::prelude::*;
 
 const OUT_FILE_NAME: &'static str = "output/ulam_spiral.png";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let root = BitMapBackend::new(OUT_FILE_NAME, (800, 800)).into_drawing_area();
+    let image_size = 1600;
+    let root = BitMapBackend::new(OUT_FILE_NAME, (image_size, image_size)).into_drawing_area();
 
     root.fill(&WHITE)?;
 
-    let size = 800f64;
+    let size = (image_size / 2) as f64;
     let chart = ChartBuilder::on(&root)
         .margin(20)
-        .x_label_area_size(10)
-        .y_label_area_size(10)
         .build_cartesian_2d(-size..size, -size..size)?;
 
     let plotting_area = chart.plotting_area();
 
     // let range = plotting_area.get_pixel_range();
     //    let (pw, ph) = (range.0.end - range.0.start, range.1.end - range.1.start);
+    let n = (100000f64 - 0f64).sqrt().ceil();
+    let block = image_size as f64 / n;
 
-    let block = 16f64;
-
-    for (_no, x, y, is_prime) in cover_times_squares(0, 100000, 3) {
-        let coord1 = ((x as f64 * block), (y as f64 * block));
-        let coord2 = ((x + 1) as f64 * block, (y + 1) as f64 * block);
+    for (_no, x, y, is_prime) in cover_primes_squares(0, 10000) {
+    // for (_no, x, y, is_prime) in cover_times_squares(0, 100000, 97) {
+        let coord1 = graphics::ulam::cover::square_spiral::normalize(block, x, y);
+        let coord2 = graphics::ulam::cover::square_spiral::normalize(block, x + 1, y + 1);
 
         if is_prime {
             plotting_area.draw(&Rectangle::new(
@@ -39,10 +39,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // ))?;
         }
 
-        plotting_area.draw(&Rectangle::new(
-            [coord1, coord2],
-            Into::<ShapeStyle>::into(&BLACK),
-        ))?;
+        // plotting_area.draw(&Rectangle::new(
+        //     [coord1, coord2],
+        //     Into::<ShapeStyle>::into(&BLACK),
+        // ))?;
     }
 
     // To avoid the IO failure being ignored silently, we manually call the present function

@@ -42,6 +42,10 @@ pub fn cover(
   v.into_iter()
 }
 
+pub fn normalize(block: f64, x: isize, y: isize) -> (f64, f64) {
+  ((x as f64 * block), (y as f64 * block))
+}
+
 #[cfg(test)]
 mod tests {
 
