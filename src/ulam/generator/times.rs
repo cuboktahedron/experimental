@@ -1,5 +1,30 @@
-pub fn generate(times_base: usize, n: usize) -> TimesOrNotIterator {
-  TimesOrNotIterator::new(times_base, n)
+use crate::ulam::generator::generator::Generator;
+use core::iter::Skip;
+
+pub struct TimesGenerator {
+  max: usize,
+  skip: usize,
+  iter: Skip<TimesOrNotIterator>,
+}
+
+impl TimesGenerator {
+  pub fn new(n: usize, times_base: usize, skip: usize) -> TimesGenerator {
+    TimesGenerator {
+      max: n,
+      skip,
+      iter: TimesOrNotIterator::new(n, times_base).skip(skip),
+    }
+  }
+}
+
+impl Generator for TimesGenerator {
+  fn data_num(&self) -> usize {
+    self.max - self.skip
+  }
+
+  fn next(&mut self) -> std::option::Option<(usize, bool)> {
+    self.iter.next()
+  }
 }
 
 pub struct TimesOrNotIterator {
@@ -9,7 +34,7 @@ pub struct TimesOrNotIterator {
 }
 
 impl TimesOrNotIterator {
-  pub fn new(times_base: usize, n: usize) -> TimesOrNotIterator {
+  pub fn new(n: usize, times_base: usize) -> TimesOrNotIterator {
     TimesOrNotIterator {
       i: 0,
       max: n,
@@ -43,13 +68,13 @@ mod tests {
 
   #[test]
   fn test_generate() {
-    let mut ite = generate(2, 5);
-    assert_eq!(ite.next(), Some((0, true)));
-    assert_eq!(ite.next(), Some((1, false)));
-    assert_eq!(ite.next(), Some((2, true)));
-    assert_eq!(ite.next(), Some((3, false)));
-    assert_eq!(ite.next(), Some((4, true)));
+    let mut ite = TimesGenerator::new(10, 2, 5);
     assert_eq!(ite.next(), Some((5, false)));
+    assert_eq!(ite.next(), Some((6, true)));
+    assert_eq!(ite.next(), Some((7, false)));
+    assert_eq!(ite.next(), Some((8, true)));
+    assert_eq!(ite.next(), Some((9, false)));
+    assert_eq!(ite.next(), Some((10, true)));
     assert_eq!(ite.next(), None);
   }
 }

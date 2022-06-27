@@ -1,5 +1,30 @@
-pub fn generate(n: usize) -> PrimesOrNotIterator {
-  PrimesOrNotIterator::new(n)
+use crate::ulam::generator::generator::Generator;
+use core::iter::Skip;
+
+pub struct PrimesGenerator {
+  max: usize,
+  skip: usize,
+  iter: Skip<PrimesOrNotIterator>,
+}
+
+impl PrimesGenerator {
+  pub fn new(n: usize, skip: usize) -> PrimesGenerator {
+    PrimesGenerator {
+      max: n,
+      skip,
+      iter: PrimesOrNotIterator::new(n).skip(skip),
+    }
+  }
+}
+
+impl Generator for PrimesGenerator {
+  fn data_num(&self) -> usize {
+    self.max - self.skip
+  }
+
+  fn next(&mut self) -> std::option::Option<(usize, bool)> {
+    self.iter.next()
+  }
 }
 
 pub struct PrimesOrNotIterator {
@@ -56,13 +81,13 @@ mod tests {
 
   #[test]
   fn test_generate() {
-    let mut ite = generate(5);
-    assert_eq!(ite.next(), Some((0, false)));
-    assert_eq!(ite.next(), Some((1, false)));
-    assert_eq!(ite.next(), Some((2, true)));
-    assert_eq!(ite.next(), Some((3, true)));
-    assert_eq!(ite.next(), Some((4, false)));
+    let mut ite = PrimesGenerator::new(10, 5);
     assert_eq!(ite.next(), Some((5, true)));
+    assert_eq!(ite.next(), Some((6, false)));
+    assert_eq!(ite.next(), Some((7, true)));
+    assert_eq!(ite.next(), Some((8, false)));
+    assert_eq!(ite.next(), Some((9, false)));
+    assert_eq!(ite.next(), Some((10, false)));
     assert_eq!(ite.next(), None);
   }
 }
