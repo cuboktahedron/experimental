@@ -3,32 +3,96 @@ use graphics::ulam::generator::primes::PrimesGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
 use plotters::prelude::*;
 
-const OUT_FILE_NAME: &'static str = "output/ulam_spiral.png";
+// const OUT_FILE_NAME: &'static str = "output/ulam_spirals.gif";
+const OUT_FILE_NAME: &'static str = "output/times_spirals.gif";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let image_size = 1600;
-    let root = BitMapBackend::new(OUT_FILE_NAME, (image_size, image_size)).into_drawing_area();
+    let image_size = 1200;
+    let root =
+        BitMapBackend::gif(OUT_FILE_NAME, (image_size, image_size), 500)?.into_drawing_area();
 
-    root.fill(&WHITE)?;
+    let (upper, lower) = root.split_vertically(100);
 
-    let size = (image_size / 2) as f64;
-    let chart = ChartBuilder::on(&root)
+    let size = ((image_size - 100) / 2) as f64;
+    let chart = ChartBuilder::on(&lower)
         .margin(20)
         .build_cartesian_2d(-size..size, -size..size)?;
     let plotting_area = chart.plotting_area();
 
-    let mut gen = PrimesGenerator::new(10000, 0);
-    let mut ss = SquareSpiral::new(&mut gen, &plotting_area);
-    while let Some(result) = ss.draw_next() {
-        result?
-    }
+    // let gen = PrimesGenerator::new(100000, 0);
+    // let mut ss = SquareSpiral::new(gen, &plotting_area);
+    // let mut i = 1;
 
-    let mut gen = TimesGenerator::new(10000, 5, 0);
-    let mut ss = SquareSpiral::new(&mut gen, &plotting_area);
-    while let Some(result) = ss.draw_next() {
-        result?
-    }
+    // root.fill(&WHITE)?;
 
-    println!("Result has been saved to {}", OUT_FILE_NAME);
+    let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
+    // while let Some(result) = ss.draw_next() {
+    //     result?;
+
+    //     if i < 10 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 100 && i % 10 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 1000 && i % 100 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 10000 && i % 1000 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 100000 && i % 10000 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 1000000 && i % 100000 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     } else if i <= 10000000 && i % 1000000 == 0 {
+    //         root.present()?;
+    //         println!("{}", i);
+    //         upper.fill(&WHITE)?;
+    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+    //     }
+
+    //     i += 1;
+    // }
+
+    // for _ in 0..100 {
+    //     root.present()?;
+    // }
+
+    let mut i = 1;
+
+    root.fill(&WHITE)?;
+
+    for i in 1..50 {
+        root.fill(&WHITE)?;
+
+        let gen = TimesGenerator::new(100000, i, 0);
+        let mut ss = SquareSpiral::new(gen, &plotting_area);
+
+        while let Some(result) = ss.draw_next() {
+            result?;
+        }
+
+        upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        root.present()?;
+
+        println!("times {} done", i);
+
+        root.present()?;
+    }
 
     Ok(())
 }

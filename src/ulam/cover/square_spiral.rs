@@ -9,13 +9,13 @@ use plotters::prelude::RED;
 
 pub struct SquareSpiral<'a, 'b> {
   plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
-  cover: Box<dyn Iterator<Item = (usize, isize, isize, bool)>>,
+  cover: SquareSpiralCover<'a>,
   block: f64,
 }
 
 impl<'a, 'b> SquareSpiral<'a, 'b> {
   pub fn new(
-    gen: &'a mut impl Generator,
+    gen: impl Generator + 'a,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   ) -> SquareSpiral<'a, 'b> {
     let n = gen.data_num();
@@ -24,7 +24,7 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     let block = (range.end - range.start) as f64 / vw;
     SquareSpiral {
       plotting_area,
-      cover: Box::new(SquareSpiral::cover(gen)),
+      cover: SquareSpiral::cover(gen),
       block,
     }
   }
@@ -56,43 +56,66 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     Some(Ok(()))
   }
 
-  fn cover(gen: &mut dyn Generator) -> impl Iterator<Item = (usize, isize, isize, bool)> {
-    // TODO: メモリにいったん確保しないようにする
-    let mut v = vec![];
-    // (dir, rest, step)
+  fn cover(gen: impl Generator + 'a) -> SquareSpiralCover<'a> {
+    SquareSpiralCover::new(gen)
+  }
+}
+
+struct SquareSpiralCover<'a> {
+  gen: Box<dyn Generator + 'a>,
+  transit_info: (usize, isize, isize),
+  prev: (usize, isize, isize, bool),
+}
+
+impl<'a> SquareSpiralCover<'a> {
+  pub fn new(gen: impl Generator + 'a) -> Self {
+    SquareSpiralCover {
+      gen: Box::new(gen),
+      transit_info: (3, 2, 1), // (dir, rest, step)
+      prev: (0, -1, 0, false),
+    }
+  }
+}
+
+impl<'a> Iterator for SquareSpiralCover<'a> {
+  type Item = (usize, isize, isize, bool);
+
+  fn next(&mut self) -> std::option::Option<Self::Item> {
     // 0: up, 1: left, 2: down, 3: right
-    let mut ctx = (3usize, 2isize, 1isize);
-    let mut prev = (0, -1, 0, false);
-    while let Some((n, b)) = gen.next() {
-      let (dir, mut rest, step) = ctx;
-      let (_, x, y, _) = prev;
-      if dir == 0 {
-        v.push((n, x, y + 1, b));
+
+    if let Some((n, b)) = self.gen.next() {
+      let (dir, mut rest, step) = self.transit_info;
+      let (_, x, y, _) = self.prev;
+      let ret = if dir == 0 {
+        (n, x, y + 1, b)
       } else if dir == 1 {
-        v.push((n, x - 1, y, b));
+        (n, x - 1, y, b)
       } else if dir == 2 {
-        v.push((n, x, y - 1, b));
+        (n, x, y - 1, b)
       } else {
-        v.push((n, x + 1, y, b));
-      }
-      prev = v[v.len() - 1];
+        (n, x + 1, y, b)
+      };
+
+      self.prev = ret;
       rest -= 1;
       if rest == 0 {
         if dir == 0 {
-          ctx = (1, step + 1, step + 1);
+          self.transit_info = (1, step + 1, step + 1);
         } else if dir == 1 {
-          ctx = (2, step, step);
+          self.transit_info = (2, step, step);
         } else if dir == 2 {
-          ctx = (3, step + 1, step + 1);
+          self.transit_info = (3, step + 1, step + 1);
         } else {
-          ctx = (0, step, step);
+          self.transit_info = (0, step, step);
         }
       } else {
-        ctx = (dir, rest, step);
+        self.transit_info = (dir, rest, step);
       }
-    }
 
-    v.into_iter()
+      return Some(ret);
+    } else {
+      return None;
+    }
   }
 }
 
@@ -104,8 +127,8 @@ mod tests {
 
   #[test]
   fn test_cover() {
-    let mut gen = PrimesGenerator::new(10, 0);
-    let mut ite = SquareSpiral::cover(&mut gen);
+    let gen = PrimesGenerator::new(10, 0);
+    let mut ite = SquareSpiral::cover(gen);
 
     assert_eq!(ite.next(), Some((0, 0, 0, false)));
     assert_eq!(ite.next(), Some((1, 1, 0, false)));
