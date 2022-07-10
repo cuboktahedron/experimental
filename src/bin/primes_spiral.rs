@@ -2,8 +2,7 @@ use graphics::ulam::cover::square_spiral::SquareSpiral;
 use graphics::ulam::generator::primes::PrimesGenerator;
 use plotters::prelude::*;
 
-// const OUT_FILE_NAME: &'static str = "output/ulam_spirals.gif";
-const OUT_FILE_NAME: &'static str = "output/times_spirals.gif";
+const OUT_FILE_NAME: &'static str = "output/primes_spirals.gif";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let image_size = 1200;
     let root =
