@@ -9,6 +9,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
 
 [[package]]
+name = "atty"
+version = "0.2.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
+dependencies = [
+ "hermit-abi",
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -61,6 +72,30 @@ dependencies = [
  "num-traits",
  "time",
  "winapi",
+]
+
+[[package]]
+name = "clap"
+version = "3.2.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "190814073e85d238f31ff738fcb0bf6910cedeb73376c87cd69291028966fd83"
+dependencies = [
+ "atty",
+ "bitflags",
+ "clap_lex",
+ "indexmap",
+ "strsim",
+ "termcolor",
+ "textwrap",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
+dependencies = [
+ "os_str_bytes",
 ]
 
 [[package]]
@@ -285,8 +320,23 @@ dependencies = [
 name = "graphics"
 version = "0.1.0"
 dependencies = [
- "chrono",
+ "clap",
  "plotters",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "607c8a29735385251a339424dd462993c0fed8fa09d378f259377df08c126022"
+
+[[package]]
+name = "hermit-abi"
+version = "0.1.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62b467343b94ba476dcb2500d242dadbb39557df889310ac77c5d99100aaac33"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -303,6 +353,16 @@ dependencies = [
  "num-rational",
  "num-traits",
  "png",
+]
+
+[[package]]
+name = "indexmap"
+version = "1.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
+dependencies = [
+ "autocfg",
+ "hashbrown",
 ]
 
 [[package]]
@@ -390,6 +450,12 @@ checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "os_str_bytes"
+version = "6.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21326818e99cfe6ce1e524c2a805c189a99b5ae555a35d19f9a284b427d86afa"
 
 [[package]]
 name = "pathfinder_geometry"
@@ -579,6 +645,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "strsim"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
 name = "syn"
 version = "1.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -588,6 +660,21 @@ dependencies = [
  "quote",
  "unicode-ident",
 ]
+
+[[package]]
+name = "termcolor"
+version = "1.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bab24d30b911b2376f3a13cc2cd443142f0c81dda04c118693e35b3835757755"
+dependencies = [
+ "winapi-util",
+]
+
+[[package]]
+name = "textwrap"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1141d4d61095b28419e22cb0bbf02755f5e54e0526f97f1e3d1d160e60885fb"
 
 [[package]]
 name = "thiserror"
