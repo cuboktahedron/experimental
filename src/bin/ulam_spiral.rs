@@ -1,6 +1,5 @@
 use graphics::ulam::cover::square_spiral::SquareSpiral;
 use graphics::ulam::generator::primes::PrimesGenerator;
-use graphics::ulam::generator::times::TimesGenerator;
 use plotters::prelude::*;
 
 // const OUT_FILE_NAME: &'static str = "output/ulam_spirals.gif";
@@ -18,81 +17,59 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_cartesian_2d(-size..size, -size..size)?;
     let plotting_area = chart.plotting_area();
 
-    // let gen = PrimesGenerator::new(100000, 0);
-    // let mut ss = SquareSpiral::new(gen, &plotting_area);
-    // let mut i = 1;
-
-    // root.fill(&WHITE)?;
-
-    let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
-    // while let Some(result) = ss.draw_next() {
-    //     result?;
-
-    //     if i < 10 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 100 && i % 10 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 1000 && i % 100 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 10000 && i % 1000 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 100000 && i % 10000 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 1000000 && i % 100000 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     } else if i <= 10000000 && i % 1000000 == 0 {
-    //         root.present()?;
-    //         println!("{}", i);
-    //         upper.fill(&WHITE)?;
-    //         upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-    //     }
-
-    //     i += 1;
-    // }
-
-    // for _ in 0..100 {
-    //     root.present()?;
-    // }
-
+    let gen = PrimesGenerator::new(100000, 0);
+    let mut ss = SquareSpiral::new(gen, &plotting_area);
     let mut i = 1;
 
     root.fill(&WHITE)?;
 
-    for i in 1..50 {
-        root.fill(&WHITE)?;
+    let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
+    while let Some(result) = ss.draw_next() {
+        result?;
 
-        let gen = TimesGenerator::new(100000, i, 0);
-        let mut ss = SquareSpiral::new(gen, &plotting_area);
-
-        while let Some(result) = ss.draw_next() {
-            result?;
+        if i < 10 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 100 && i % 10 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 1000 && i % 100 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 10000 && i % 1000 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 100000 && i % 10000 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 1000000 && i % 100000 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
+        } else if i <= 10000000 && i % 1000000 == 0 {
+            root.present()?;
+            println!("{}", i);
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
         }
 
-        upper.draw_text(&format!("i = {}", i.to_string()), &style, (20, 20))?;
-        root.present()?;
-
-        println!("times {} done", i);
-
-        root.present()?;
+        i += 1;
     }
+
+    // for _ in 0..100 {
+    //     root.present()?;
+    // }
 
     Ok(())
 }
