@@ -1,2 +1,2 @@
-pub mod cover;
+pub mod tile;
 pub mod generator;

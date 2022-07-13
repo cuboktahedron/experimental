@@ -1,4 +1,4 @@
-use graphics::ulam::cover::square_spiral::SquareSpiral;
+use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::generator::squares::SquareGenerator;
 use plotters::prelude::*;
 

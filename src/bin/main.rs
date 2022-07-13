@@ -1,5 +1,5 @@
 use clap::Parser;
-use graphics::ulam::cover::square_spiral::SquareSpiral;
+use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::generator::generator::Generator;
 use graphics::ulam::generator::primes::PrimesGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
@@ -61,7 +61,7 @@ fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::err
   name = "Gen-Cov",
   author = "cuboktahedron",
   version = "v0.1.0",
-  about = "Draw with generator and cover."
+  about = "Draw with generator and tile."
 )]
 
 struct AppArg {
@@ -69,7 +69,7 @@ struct AppArg {
   generator: String,
 
   #[clap(short, long, default_value = "spiral4")]
-  cover: String,
+  tile: String,
 
   #[clap(long)]
   gp: String,

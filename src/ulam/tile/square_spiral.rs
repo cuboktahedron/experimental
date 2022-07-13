@@ -7,39 +7,34 @@ use plotters::prelude::Rectangle;
 use plotters::prelude::ShapeStyle;
 use plotters::prelude::RED;
 
-pub struct SquareZigzag<'a, 'b> {
+pub struct SquareSpiral<'a, 'b> {
   plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
-  cover: SquareZigzagCover<'a>,
+  tile: SquareSpiralTile<'a>,
   block: f64,
 }
 
-impl<'a, 'b> SquareZigzag<'a, 'b> {
+impl<'a, 'b> SquareSpiral<'a, 'b> {
   pub fn new(
-    gen: impl Generator + 'a,
+    gen: Box<dyn Generator + 'a>,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
-  ) -> SquareZigzag<'a, 'b> {
+  ) -> SquareSpiral<'a, 'b> {
     let n = gen.data_num();
     let vw = (n as f64).sqrt().ceil();
     let range = plotting_area.get_pixel_range().0;
     let block = (range.end - range.start) as f64 / vw;
-    SquareZigzag {
+    SquareSpiral {
       plotting_area,
-      cover: SquareZigzag::cover(gen),
+      tile: SquareSpiral::tile(gen),
       block,
     }
   }
 
   fn normalize(&self, x: isize, y: isize) -> (f64, f64) {
-    let o1 = self.plotting_area.get_x_range();
-    let o2 = self.plotting_area.get_y_range();
-    (
-      (x as f64 * self.block + o1.start as f64),
-      (y as f64 * self.block + o2.start as f64),
-    )
+    ((x as f64 * self.block), (y as f64 * self.block))
   }
 
   pub fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
-    if let Some((_, x, y, b)) = self.cover.next() {
+    if let Some((_, x, y, b)) = self.tile.next() {
       let coord1 = self.normalize(x, y);
       let coord2 = self.normalize(x + 1, y + 1);
 
@@ -61,71 +56,60 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
     Some(Ok(()))
   }
 
-  fn cover(gen: impl Generator + 'a) -> SquareZigzagCover<'a> {
-    SquareZigzagCover::new(gen)
+  fn tile(gen: Box<dyn Generator + 'a>) -> SquareSpiralTile<'a> {
+    SquareSpiralTile::new(gen)
   }
 }
 
-struct SquareZigzagCover<'a> {
+struct SquareSpiralTile<'a> {
   gen: Box<dyn Generator + 'a>,
   transit_info: (usize, isize, isize),
   prev: (usize, isize, isize, bool),
 }
 
-impl<'a> SquareZigzagCover<'a> {
-  pub fn new(gen: impl Generator + 'a) -> Self {
-    SquareZigzagCover {
-      gen: Box::new(gen),
-      transit_info: (0, 2, 0), // (dir, rest, cycle)
+impl<'a> SquareSpiralTile<'a> {
+  pub fn new(gen: Box<dyn Generator + 'a>) -> Self {
+    SquareSpiralTile {
+      gen,
+      transit_info: (3, 2, 1), // (dir, rest, step)
       prev: (0, -1, 0, false),
     }
   }
 }
 
-impl<'a> Iterator for SquareZigzagCover<'a> {
+impl<'a> Iterator for SquareSpiralTile<'a> {
   type Item = (usize, isize, isize, bool);
 
   fn next(&mut self) -> std::option::Option<Self::Item> {
-    // 0: right, 1: up, 2: left, 3: up2, 4: right2, 5: down
+    // 0: up, 1: left, 2: down, 3: right
 
     if let Some((n, b)) = self.gen.next() {
-      let (dir, mut rest, cycle) = self.transit_info;
+      let (dir, mut rest, step) = self.transit_info;
       let (_, x, y, _) = self.prev;
-      let ret = if dir == 0 || dir == 4 {
-        (n, x + 1, y, b)
-      } else if dir == 1 || dir == 3 {
+      let ret = if dir == 0 {
         (n, x, y + 1, b)
-      } else if dir == 2 {
+      } else if dir == 1 {
         (n, x - 1, y, b)
-      } else {
+      } else if dir == 2 {
         (n, x, y - 1, b)
+      } else {
+        (n, x + 1, y, b)
       };
-
-      // 0: right -> 1
-      // 1: up -> 2n - 1
-      // 2: left -> 2n - 1
-      // 3: up -> 1
-      // 4: right -> 2n
-      // 5: down -> 2n
 
       self.prev = ret;
       rest -= 1;
       if rest == 0 {
         if dir == 0 {
-          self.transit_info = (1, 2 * cycle + 1, cycle);
+          self.transit_info = (1, step + 1, step + 1);
         } else if dir == 1 {
-          self.transit_info = (2, 2 * cycle + 1, cycle);
+          self.transit_info = (2, step, step);
         } else if dir == 2 {
-          self.transit_info = (3, 1, cycle);
-        } else if dir == 3 {
-          self.transit_info = (4, 2 * (cycle + 1), cycle);
-        } else if dir == 4 {
-          self.transit_info = (5, 2 * (cycle + 1), cycle);
-        } else if dir == 5 {
-          self.transit_info = (0, 1, cycle + 1);
+          self.transit_info = (3, step + 1, step + 1);
+        } else {
+          self.transit_info = (0, step, step);
         }
       } else {
-        self.transit_info = (dir, rest, cycle);
+        self.transit_info = (dir, rest, step);
       }
 
       return Some(ret);
@@ -142,21 +126,21 @@ mod tests {
   use crate::ulam::generator::primes::PrimesGenerator;
 
   #[test]
-  fn test_cover() {
+  fn test_tile() {
     let gen = PrimesGenerator::new(10, 0);
-    let mut ite = SquareZigzag::cover(gen);
+    let mut ite = SquareSpiral::tile(Box::new(gen));
 
     assert_eq!(ite.next(), Some((0, 0, 0, false)));
     assert_eq!(ite.next(), Some((1, 1, 0, false)));
     assert_eq!(ite.next(), Some((2, 1, 1, true)));
     assert_eq!(ite.next(), Some((3, 0, 1, true)));
-    assert_eq!(ite.next(), Some((4, 0, 2, false)));
-    assert_eq!(ite.next(), Some((5, 1, 2, true)));
-    assert_eq!(ite.next(), Some((6, 2, 2, false)));
-    assert_eq!(ite.next(), Some((7, 2, 1, true)));
-    assert_eq!(ite.next(), Some((8, 2, 0, false)));
-    assert_eq!(ite.next(), Some((9, 3, 0, false)));
-    assert_eq!(ite.next(), Some((10, 3, 1, false)));
+    assert_eq!(ite.next(), Some((4, -1, 1, false)));
+    assert_eq!(ite.next(), Some((5, -1, 0, true)));
+    assert_eq!(ite.next(), Some((6, -1, -1, false)));
+    assert_eq!(ite.next(), Some((7, 0, -1, true)));
+    assert_eq!(ite.next(), Some((8, 1, -1, false)));
+    assert_eq!(ite.next(), Some((9, 2, -1, false)));
+    assert_eq!(ite.next(), Some((10, 2, 0, false)));
     assert_eq!(ite.next(), None);
   }
 }

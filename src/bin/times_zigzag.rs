@@ -1,4 +1,4 @@
-use graphics::ulam::cover::square_zigzag::SquareZigzag;
+use graphics::ulam::tile::square_zigzag::SquareZigzag;
 use graphics::ulam::generator::times::TimesGenerator;
 use plotters::prelude::*;
 
