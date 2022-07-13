@@ -1,3 +1,4 @@
+use graphics::ulam::tile::tile::Tile;
 use graphics::ulam::tile::square_spiral::SquareSpiral;
 
 use graphics::ulam::generator::times::TimesGenerator;

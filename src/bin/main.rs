@@ -1,11 +1,16 @@
 use clap::Parser;
-use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::generator::generator::Generator;
 use graphics::ulam::generator::primes::PrimesGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
+use graphics::ulam::tile::square_spiral::SquareSpiral;
+use graphics::ulam::tile::square_zigzag::SquareZigzag;
+use graphics::ulam::tile::tile::Tile;
+use plotters::coord::types::RangedCoordf64;
 use plotters::drawing::IntoDrawingArea;
 use plotters::prelude::BitMapBackend;
+use plotters::prelude::Cartesian2d;
 use plotters::prelude::ChartBuilder;
+use plotters::prelude::DrawingArea;
 use plotters::prelude::TextStyle;
 use plotters::prelude::BLACK;
 use plotters::prelude::WHITE;
@@ -30,9 +35,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let plotting_area = chart.plotting_area();
 
   let gen = create_generator(&arg)?;
-  let mut ss = SquareSpiral::new(gen, &plotting_area);
+  let mut tile = create_tile(&arg, gen, &plotting_area)?;
 
-  while let Some(result) = ss.draw_next() {
+  while let Some(result) = tile.draw_next() {
     result?;
   }
 
@@ -56,9 +61,27 @@ fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::err
   panic!()
 }
 
+fn create_tile<'a>(
+  arg: &AppArg,
+  gen: Box<dyn Generator>,
+  plotting_area: &'a DrawingArea<BitMapBackend, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
+) -> Result<Box<dyn Tile + 'a>, Box<dyn std::error::Error>> {
+  if arg.tile == "spiral4" {
+    let gen = SquareSpiral::from_tp(&arg.tp, gen, plotting_area)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.tile == "zigzag4" {
+    let gen = SquareZigzag::from_tp(&arg.tp, gen, plotting_area)?;
+    return Ok(Box::new(gen));
+  }
+
+  panic!()
+}
+
 #[derive(Parser, Debug)]
 #[clap(
-  name = "Gen-Cov",
+  name = "Gen-Tile",
   author = "cuboktahedron",
   version = "v0.1.0",
   about = "Draw with generator and tile."
@@ -73,6 +96,9 @@ struct AppArg {
 
   #[clap(long)]
   gp: String,
+
+  #[clap(long)]
+  tp: String,
 
   #[clap(short, long)]
   output: Option<String>,

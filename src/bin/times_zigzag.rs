@@ -1,5 +1,6 @@
-use graphics::ulam::tile::square_zigzag::SquareZigzag;
 use graphics::ulam::generator::times::TimesGenerator;
+use graphics::ulam::tile::square_zigzag::SquareZigzag;
+use graphics::ulam::tile::tile::Tile;
 use plotters::prelude::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let plotting_area = chart.plotting_area();
 
         let gen = TimesGenerator::new(1000000, i, 0);
-        let mut ss = SquareZigzag::new(gen, &plotting_area);
+        let mut ss = SquareZigzag::new(Box::new(gen), &plotting_area);
 
         while let Some(result) = ss.draw_next() {
             result?;

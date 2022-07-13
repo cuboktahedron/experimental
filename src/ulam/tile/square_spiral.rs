@@ -1,4 +1,5 @@
 use crate::ulam::generator::generator::Generator;
+use crate::ulam::tile::tile::Tile;
 use plotters::coord::types::RangedCoordf64;
 use plotters::prelude::BitMapBackend;
 use plotters::prelude::Cartesian2d;
@@ -29,11 +30,25 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     }
   }
 
+  pub fn from_tp(
+    #[allow(unused_variables)] tp: &str,
+    gen: Box<dyn Generator + 'a>,
+    plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
+  ) -> Result<Self, Box<dyn std::error::Error>> {
+    Ok(Self::new(gen, plotting_area))
+  }
+
+  fn tile(gen: Box<dyn Generator + 'a>) -> SquareSpiralTile<'a> {
+    SquareSpiralTile::new(gen)
+  }
+
   fn normalize(&self, x: isize, y: isize) -> (f64, f64) {
     ((x as f64 * self.block), (y as f64 * self.block))
   }
+}
 
-  pub fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
+impl<'a, 'b> Tile for SquareSpiral<'a, 'b> {
+  fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
     if let Some((_, x, y, b)) = self.tile.next() {
       let coord1 = self.normalize(x, y);
       let coord2 = self.normalize(x + 1, y + 1);
@@ -54,10 +69,6 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     }
 
     Some(Ok(()))
-  }
-
-  fn tile(gen: Box<dyn Generator + 'a>) -> SquareSpiralTile<'a> {
-    SquareSpiralTile::new(gen)
   }
 }
 

@@ -1,4 +1,5 @@
 use crate::ulam::generator::generator::Generator;
+use crate::ulam::tile::tile::Tile;
 use plotters::coord::types::RangedCoordf64;
 use plotters::prelude::BitMapBackend;
 use plotters::prelude::Cartesian2d;
@@ -15,7 +16,7 @@ pub struct SquareZigzag<'a, 'b> {
 
 impl<'a, 'b> SquareZigzag<'a, 'b> {
   pub fn new(
-    gen: impl Generator + 'a,
+    gen: Box<dyn Generator + 'a>,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   ) -> SquareZigzag<'a, 'b> {
     let n = gen.data_num();
@@ -29,6 +30,14 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
     }
   }
 
+  pub fn from_tp(
+    #[allow(unused_variables)] tp: &str,
+    gen: Box<dyn Generator + 'a>,
+    plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
+  ) -> Result<Self, Box<dyn std::error::Error>> {
+    Ok(Self::new(gen, plotting_area))
+  }
+
   fn normalize(&self, x: isize, y: isize) -> (f64, f64) {
     let o1 = self.plotting_area.get_x_range();
     let o2 = self.plotting_area.get_y_range();
@@ -38,7 +47,13 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
     )
   }
 
-  pub fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
+  fn tile(gen: Box<dyn Generator + 'a>) -> SquareZigzagTile<'a> {
+    SquareZigzagTile::new(gen)
+  }
+}
+
+impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
+  fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
     if let Some((_, x, y, b)) = self.tile.next() {
       let coord1 = self.normalize(x, y);
       let coord2 = self.normalize(x + 1, y + 1);
@@ -60,10 +75,6 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
 
     Some(Ok(()))
   }
-
-  fn tile(gen: impl Generator + 'a) -> SquareZigzagTile<'a> {
-    SquareZigzagTile::new(gen)
-  }
 }
 
 struct SquareZigzagTile<'a> {
@@ -73,9 +84,9 @@ struct SquareZigzagTile<'a> {
 }
 
 impl<'a> SquareZigzagTile<'a> {
-  pub fn new(gen: impl Generator + 'a) -> Self {
+  pub fn new(gen: Box<dyn Generator + 'a>) -> Self {
     SquareZigzagTile {
-      gen: Box::new(gen),
+      gen,
       transit_info: (0, 2, 0), // (dir, rest, cycle)
       prev: (0, -1, 0, false),
     }
@@ -144,7 +155,7 @@ mod tests {
   #[test]
   fn test_tile() {
     let gen = PrimesGenerator::new(10, 0);
-    let mut ite = SquareZigzag::tile(gen);
+    let mut ite = SquareZigzag::tile(Box::new(gen));
 
     assert_eq!(ite.next(), Some((0, 0, 0, false)));
     assert_eq!(ite.next(), Some((1, 1, 0, false)));

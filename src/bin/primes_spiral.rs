@@ -1,5 +1,6 @@
-use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::generator::primes::PrimesGenerator;
+use graphics::ulam::tile::square_spiral::SquareSpiral;
+use graphics::ulam::tile::tile::Tile;
 use plotters::prelude::*;
 
 const OUT_FILE_NAME: &'static str = "output/primes_spirals.gif";

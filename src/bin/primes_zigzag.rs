@@ -1,5 +1,6 @@
-use graphics::ulam::tile::square_zigzag::SquareZigzag;
 use graphics::ulam::generator::primes::PrimesGenerator;
+use graphics::ulam::tile::square_zigzag::SquareZigzag;
+use graphics::ulam::tile::tile::Tile;
 use plotters::prelude::*;
 
 // const OUT_FILE_NAME: &'static str = "output/ulam_spirals.gif";
@@ -18,7 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let plotting_area = chart.plotting_area();
 
     let gen = PrimesGenerator::new(100000, 0);
-    let mut ss = SquareZigzag::new(gen, &plotting_area);
+    let mut ss = SquareZigzag::new(Box::new(gen), &plotting_area);
     let mut i = 1;
 
     root.fill(&WHITE)?;
