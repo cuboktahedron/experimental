@@ -8,12 +8,39 @@ pub struct TimesGenerator {
 }
 
 impl TimesGenerator {
-  pub fn new(n: usize, times_base: usize, skip: usize) -> TimesGenerator {
+  pub fn new(n: usize, times_base: usize, skip: usize) -> Self {
     TimesGenerator {
       max: n,
       skip,
       iter: TimesOrNotIterator::new(n, times_base).skip(skip),
     }
+  }
+
+  pub fn from_gp(gp: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    let mut gp = gp.split(":");
+    let from = gp.next();
+    let to = gp.next();
+    let times = gp.next();
+
+    let from: usize = if let Some(from) = from {
+      from.parse()?
+    } else {
+      0
+    };
+
+    let to: usize = if let Some(to) = to {
+      to.parse()?
+    } else {
+      10000
+    };
+
+    let times: usize = if let Some(times) = times {
+      times.parse()?
+    } else {
+      2
+    };
+
+    Ok(Self::new(to, times, from))
   }
 }
 

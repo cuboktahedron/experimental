@@ -15,7 +15,7 @@ pub struct SquareSpiral<'a, 'b> {
 
 impl<'a, 'b> SquareSpiral<'a, 'b> {
   pub fn new(
-    gen: impl Generator + 'a,
+    gen: Box<dyn Generator + 'a>,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   ) -> SquareSpiral<'a, 'b> {
     let n = gen.data_num();
@@ -56,7 +56,7 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     Some(Ok(()))
   }
 
-  fn cover(gen: impl Generator + 'a) -> SquareSpiralCover<'a> {
+  fn cover(gen: Box<dyn Generator + 'a>) -> SquareSpiralCover<'a> {
     SquareSpiralCover::new(gen)
   }
 }
@@ -68,9 +68,9 @@ struct SquareSpiralCover<'a> {
 }
 
 impl<'a> SquareSpiralCover<'a> {
-  pub fn new(gen: impl Generator + 'a) -> Self {
+  pub fn new(gen: Box<dyn Generator + 'a>) -> Self {
     SquareSpiralCover {
-      gen: Box::new(gen),
+      gen,
       transit_info: (3, 2, 1), // (dir, rest, step)
       prev: (0, -1, 0, false),
     }
@@ -128,7 +128,7 @@ mod tests {
   #[test]
   fn test_cover() {
     let gen = PrimesGenerator::new(10, 0);
-    let mut ite = SquareSpiral::cover(gen);
+    let mut ite = SquareSpiral::cover(Box::new(gen));
 
     assert_eq!(ite.next(), Some((0, 0, 0, false)));
     assert_eq!(ite.next(), Some((1, 1, 0, false)));

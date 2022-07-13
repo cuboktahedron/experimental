@@ -8,12 +8,28 @@ pub struct PrimesGenerator {
 }
 
 impl PrimesGenerator {
-  pub fn new(n: usize, skip: usize) -> PrimesGenerator {
+  pub fn new(n: usize, skip: usize) -> Self {
     PrimesGenerator {
       max: n,
       skip,
       iter: PrimesOrNotIterator::new(n).skip(skip),
     }
+  }
+
+  pub fn from_gp(gp: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    let mut gp = gp.split(":");
+    let from = gp.next();
+    let to = gp.next();
+
+    let from: usize = if let Some(from) = from {
+      from.parse()?
+    } else {
+      0
+    };
+
+    let to: usize = if let Some(to) = to { to.parse()? } else { 10000 };
+
+    Ok(Self::new(to, from))
   }
 }
 

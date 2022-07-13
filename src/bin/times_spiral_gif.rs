@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         root.fill(&WHITE)?;
 
         let gen = TimesGenerator::new(100000, i, 0);
-        let mut ss = SquareSpiral::new(gen, &plotting_area);
+        let mut ss = SquareSpiral::new(Box::new(gen), &plotting_area);
 
         while let Some(result) = ss.draw_next() {
             result?;

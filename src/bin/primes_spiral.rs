@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let plotting_area = chart.plotting_area();
 
     let gen = PrimesGenerator::new(100000, 0);
-    let mut ss = SquareSpiral::new(gen, &plotting_area);
+    let mut ss = SquareSpiral::new(Box::new(gen), &plotting_area);
     let mut i = 1;
 
     root.fill(&WHITE)?;
