@@ -1,5 +1,8 @@
 use clap::Parser;
 use graphics::ulam::generator::generator::Generator;
+use graphics::ulam::generator::prime1s::Prime1sGenerator;
+use graphics::ulam::generator::prime3s::Prime3sGenerator;
+use graphics::ulam::generator::prime7s::Prime7sGenerator;
 use graphics::ulam::generator::primes::PrimesGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
 use graphics::ulam::tile::square_spiral::SquareSpiral;
@@ -50,6 +53,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::error::Error>> {
   if arg.generator == "primes" {
     let gen = PrimesGenerator::from_gp(&arg.gp)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.generator == "prime1s" {
+    let gen = Prime1sGenerator::from_gp(&arg.gp)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.generator == "prime3s" {
+    let gen = Prime3sGenerator::from_gp(&arg.gp)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.generator == "prime7s" {
+    let gen = Prime7sGenerator::from_gp(&arg.gp)?;
     return Ok(Box::new(gen));
   }
 
