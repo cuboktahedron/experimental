@@ -1,3 +1,4 @@
+pub mod fibonacci;
 pub mod generator;
 pub mod prime1s;
 pub mod prime3s;

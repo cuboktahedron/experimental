@@ -1,4 +1,5 @@
 use clap::Parser;
+use graphics::ulam::generator::fibonacci::FibonacciGenerator;
 use graphics::ulam::generator::generator::Generator;
 use graphics::ulam::generator::prime1s::Prime1sGenerator;
 use graphics::ulam::generator::prime3s::Prime3sGenerator;
@@ -76,6 +77,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::error::Error>> {
+  if arg.generator == "fibonacci" {
+    let gen = FibonacciGenerator::from_gp(&arg.gp)?;
+    return Ok(Box::new(gen));
+  }
+
   if arg.generator == "primes" {
     let gen = PrimesGenerator::from_gp(&arg.gp)?;
     return Ok(Box::new(gen));
