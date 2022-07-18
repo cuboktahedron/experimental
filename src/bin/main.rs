@@ -20,6 +20,7 @@ use plotters::prelude::BLACK;
 use plotters::prelude::WHITE;
 use plotters::style::IntoFont;
 use std::fs::create_dir;
+use std::fs::create_dir_all;
 use std::path::Path;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -39,6 +40,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       arg.generator, arg.tile, arg.image_size, arg.gp
     )
   };
+
+  let path = Path::new(&file_path);
+  if let Some(ref parent) = path.parent() {
+    if !parent.is_dir() {
+      println!("{:?}", parent);
+      create_dir_all(parent).expect(&format!("Can't create dir({:?})", parent));
+    }
+  }
 
   let root = BitMapBackend::new(&file_path, (image_size, image_size)).into_drawing_area();
   root.fill(&WHITE)?;
