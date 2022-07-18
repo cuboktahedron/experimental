@@ -4,6 +4,7 @@ use graphics::ulam::generator::prime1s::Prime1sGenerator;
 use graphics::ulam::generator::prime3s::Prime3sGenerator;
 use graphics::ulam::generator::prime7s::Prime7sGenerator;
 use graphics::ulam::generator::primes::PrimesGenerator;
+use graphics::ulam::generator::squares::SquareGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
 use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::tile::square_zigzag::SquareZigzag;
@@ -18,15 +19,28 @@ use plotters::prelude::TextStyle;
 use plotters::prelude::BLACK;
 use plotters::prelude::WHITE;
 use plotters::style::IntoFont;
+use std::fs::create_dir;
+use std::path::Path;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let arg: AppArg = AppArg::parse();
 
-  let image_size = 1600;
+  let image_size = 2400;
   let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
 
-  let file_name = format!("output/test.png");
-  let root = BitMapBackend::new(&file_name, (image_size, image_size)).into_drawing_area();
+  if !Path::new("output").is_dir() {
+    create_dir("output")?;
+  }
+  let file_path = if let Some(ref file) = arg.output {
+    format!("output/{}", file)
+  } else {
+    format!(
+      "output/{}-{}-{}-{}.png",
+      arg.generator, arg.tile, arg.image_size, arg.gp
+    )
+  };
+
+  let root = BitMapBackend::new(&file_path, (image_size, image_size)).into_drawing_area();
   root.fill(&WHITE)?;
 
   let (upper, lower) = root.split_vertically(100);
@@ -45,7 +59,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   }
 
   upper.draw_text(&format!("{}", arg.gp), &style, (20, 20))?;
-  root.present()?;
+  root
+    .present()
+    .expect(&format!("Failed to output file({})", file_path));
 
   Ok(())
 }
@@ -73,6 +89,11 @@ fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::err
 
   if arg.generator == "times" {
     let gen = TimesGenerator::from_gp(&arg.gp)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.generator == "squares" {
+    let gen = SquareGenerator::from_gp(&arg.gp)?;
     return Ok(Box::new(gen));
   }
 
@@ -112,10 +133,10 @@ struct AppArg {
   #[clap(short, long, default_value = "spiral4")]
   tile: String,
 
-  #[clap(long)]
+  #[clap(long, default_value = "0")]
   gp: String,
 
-  #[clap(long)]
+  #[clap(long, default_value = "0")]
   tp: String,
 
   #[clap(short, long)]
