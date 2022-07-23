@@ -7,6 +7,7 @@ use graphics::ulam::generator::prime7s::Prime7sGenerator;
 use graphics::ulam::generator::primes::PrimesGenerator;
 use graphics::ulam::generator::squares::SquareGenerator;
 use graphics::ulam::generator::times::TimesGenerator;
+use graphics::ulam::tile::hexagon_spiral::HexagonSpiral;
 use graphics::ulam::tile::square_spiral::SquareSpiral;
 use graphics::ulam::tile::square_zigzag::SquareZigzag;
 use graphics::ulam::tile::tile::Tile;
@@ -122,6 +123,11 @@ fn create_tile<'a>(
 ) -> Result<Box<dyn Tile + 'a>, Box<dyn std::error::Error>> {
   if arg.tile == "spiral4" {
     let gen = SquareSpiral::from_tp(&arg.tp, gen, plotting_area)?;
+    return Ok(Box::new(gen));
+  }
+
+  if arg.tile == "spiral6" {
+    let gen = HexagonSpiral::from_tp(&arg.tp, gen, plotting_area)?;
     return Ok(Box::new(gen));
   }
 
