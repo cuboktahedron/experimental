@@ -1,5 +1,6 @@
 use crate::ulam::generator::generator::Generator;
 use crate::ulam::tile::tile::Tile;
+use crate::ulam::tile::types::LabelMode;
 use plotters::coord::types::RangedCoordf64;
 use plotters::prelude::BitMapBackend;
 use plotters::prelude::Cartesian2d;
@@ -16,7 +17,7 @@ pub struct HexagonSpiral<'a, 'b> {
   plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   tile: HexagonSpiralTile<'a>,
   block: f64,
-  show_label: bool,
+  label_mode: LabelMode,
 }
 
 impl<'a, 'b> HexagonSpiral<'a, 'b> {
@@ -44,7 +45,7 @@ impl<'a, 'b> HexagonSpiral<'a, 'b> {
       plotting_area,
       tile: HexagonSpiral::tile(gen),
       block,
-      show_label: false,
+      label_mode: LabelMode::None,
     }
   }
 
@@ -56,15 +57,15 @@ impl<'a, 'b> HexagonSpiral<'a, 'b> {
     let mut tile = Self::new(gen, plotting_area);
 
     let mut tp = tp.split(":");
-    let show_label = tp.next();
+    let label_mode = tp.next();
 
-    let show_label: usize = if let Some(from) = show_label {
+    let label_mode: usize = if let Some(from) = label_mode {
       from.parse()?
     } else {
       0
     };
 
-    tile.show_label = show_label > 0;
+    tile.label_mode = LabelMode::from(label_mode);
     Ok(tile)
   }
 
@@ -96,8 +97,8 @@ impl<'a, 'b> Tile for HexagonSpiral<'a, 'b> {
           return Some(Err(Box::new(err)));
         };
 
-        let font_size = (self.block / 2.0).min(100f64).max(8.0);
-        if self.show_label {
+        if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyPositive {
+          let font_size = (self.block / 2.0).min(100f64).max(8.0);
           let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
           r = self
             .plotting_area
@@ -108,6 +109,19 @@ impl<'a, 'b> Tile for HexagonSpiral<'a, 'b> {
           Ok(_) => Some(Ok(())),
           Err(err) => Some(Err(Box::new(err))),
         };
+      } else {
+        if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyNegative {
+          let font_size = (self.block / 2.0).min(100f64).max(8.0);
+          let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
+          let r = self
+            .plotting_area
+            .draw(&Text::new(n.to_string(), (coord1.0, coord2.1), &style));
+
+          return match r {
+            Ok(_) => Some(Ok(())),
+            Err(err) => Some(Err(Box::new(err))),
+          };
+        }
       }
     } else {
       return None;

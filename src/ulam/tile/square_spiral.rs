@@ -1,3 +1,4 @@
+use crate::ulam::tile::types::LabelMode;
 use crate::ulam::generator::generator::Generator;
 use crate::ulam::tile::tile::Tile;
 use plotters::coord::types::RangedCoordf64;
@@ -16,7 +17,7 @@ pub struct SquareSpiral<'a, 'b> {
   plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   tile: SquareSpiralTile<'a>,
   block: f64,
-  show_label: bool,
+  label_mode: LabelMode,
 }
 
 impl<'a, 'b> SquareSpiral<'a, 'b> {
@@ -32,7 +33,7 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
       plotting_area,
       tile: SquareSpiral::tile(gen),
       block,
-      show_label: false,
+      label_mode: LabelMode::None,
     }
   }
 
@@ -44,15 +45,15 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     let mut tile = Self::new(gen, plotting_area);
 
     let mut tp = tp.split(":");
-    let show_label = tp.next();
+    let label_mode = tp.next();
 
-    let show_label: usize = if let Some(from) = show_label {
+    let label_mode: usize = if let Some(from) = label_mode {
       from.parse()?
     } else {
       0
     };
 
-    tile.show_label = show_label > 0;
+    tile.label_mode = LabelMode::from(label_mode);
     Ok(tile)
   }
 
@@ -81,8 +82,8 @@ impl<'a, 'b> Tile for SquareSpiral<'a, 'b> {
           return Some(Err(Box::new(err)));
         };
 
-        let font_size = (self.block / 2.0).min(100f64).max(8.0);
-        if self.show_label {
+        if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyPositive {
+          let font_size = (self.block / 2.0).min(100f64).max(8.0);
           let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
           r = self
             .plotting_area
@@ -93,6 +94,19 @@ impl<'a, 'b> Tile for SquareSpiral<'a, 'b> {
           Ok(_) => Some(Ok(())),
           Err(err) => Some(Err(Box::new(err))),
         };
+      } else {
+        if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyNegative {
+          let font_size = (self.block / 2.0).min(100f64).max(8.0);
+          let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
+          let r = self
+            .plotting_area
+            .draw(&Text::new(n.to_string(), (coord1.0, coord2.1), &style));
+
+          return match r {
+            Ok(_) => Some(Ok(())),
+            Err(err) => Some(Err(Box::new(err))),
+          };
+        }
       }
     } else {
       return None;
