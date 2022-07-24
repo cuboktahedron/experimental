@@ -28,7 +28,6 @@ use std::path::Path;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let arg: AppArg = AppArg::parse();
 
-  let image_size = 2400;
   let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
 
   if !Path::new("output").is_dir() {
@@ -51,12 +50,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
   }
 
-  let root = BitMapBackend::new(&file_path, (image_size, image_size)).into_drawing_area();
+  let root = BitMapBackend::new(&file_path, (arg.image_size, arg.image_size)).into_drawing_area();
   root.fill(&WHITE)?;
 
   let (upper, lower) = root.split_vertically(100);
 
-  let size = ((image_size - 100) / 2) as f64;
+  let size = ((arg.image_size - 100) / 2) as f64;
   let chart = ChartBuilder::on(&lower)
     .margin(20)
     .build_cartesian_2d(-size..size, -size..size)?;
@@ -164,5 +163,5 @@ struct AppArg {
   output: Option<String>,
 
   #[clap(short, long, default_value = "800")]
-  image_size: u16,
+  image_size: u32,
 }
