@@ -49,7 +49,7 @@ impl<'a, 'b> HexagonSpiral<'a, 'b> {
   }
 
   pub fn from_tp(
-    #[allow(unused_variables)] tp: &str,
+    tp: &str,
     gen: Box<dyn Generator + 'a>,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   ) -> Result<Self, Box<dyn std::error::Error>> {

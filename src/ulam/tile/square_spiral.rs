@@ -6,12 +6,17 @@ use plotters::prelude::Cartesian2d;
 use plotters::prelude::DrawingArea;
 use plotters::prelude::Rectangle;
 use plotters::prelude::ShapeStyle;
+use plotters::prelude::Text;
+use plotters::prelude::TextStyle;
+use plotters::prelude::BLACK;
 use plotters::prelude::RED;
+use plotters::style::IntoFont;
 
 pub struct SquareSpiral<'a, 'b> {
   plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   tile: SquareSpiralTile<'a>,
   block: f64,
+  show_label: bool,
 }
 
 impl<'a, 'b> SquareSpiral<'a, 'b> {
@@ -27,15 +32,28 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
       plotting_area,
       tile: SquareSpiral::tile(gen),
       block,
+      show_label: false,
     }
   }
 
   pub fn from_tp(
-    #[allow(unused_variables)] tp: &str,
+    tp: &str,
     gen: Box<dyn Generator + 'a>,
     plotting_area: &'a DrawingArea<BitMapBackend<'b>, Cartesian2d<RangedCoordf64, RangedCoordf64>>,
   ) -> Result<Self, Box<dyn std::error::Error>> {
-    Ok(Self::new(gen, plotting_area))
+    let mut tile = Self::new(gen, plotting_area);
+
+    let mut tp = tp.split(":");
+    let show_label = tp.next();
+
+    let show_label: usize = if let Some(from) = show_label {
+      from.parse()?
+    } else {
+      0
+    };
+
+    tile.show_label = show_label > 0;
+    Ok(tile)
   }
 
   fn tile(gen: Box<dyn Generator + 'a>) -> SquareSpiralTile<'a> {
@@ -49,15 +67,27 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
 
 impl<'a, 'b> Tile for SquareSpiral<'a, 'b> {
   fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
-    if let Some((_, x, y, b)) = self.tile.next() {
+    if let Some((n, x, y, b)) = self.tile.next() {
       let coord1 = self.normalize(x, y);
       let coord2 = self.normalize(x + 1, y + 1);
 
       if b {
-        let r = self.plotting_area.draw(&Rectangle::new(
+        let mut r = self.plotting_area.draw(&Rectangle::new(
           [coord1, coord2],
           Into::<ShapeStyle>::into(&RED).filled(),
         ));
+
+        if let Err(err) = r {
+          return Some(Err(Box::new(err)));
+        };
+
+        let font_size = (self.block / 2.0).min(100f64).max(8.0);
+        if self.show_label {
+          let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
+          r = self
+            .plotting_area
+            .draw(&Text::new(n.to_string(), (coord1.0, coord2.1), &style));
+        }
 
         return match r {
           Ok(_) => Some(Ok(())),
