@@ -1,7 +1,7 @@
-use graphics::ulam::tile::tile::Tile;
-use graphics::ulam::tile::square_spiral::SquareSpiral;
+use ulam::ulam::tile::tile::Tile;
+use ulam::ulam::tile::square_spiral::SquareSpiral;
 
-use graphics::ulam::generator::times::TimesGenerator;
+use ulam::ulam::generator::times::TimesGenerator;
 use plotters::prelude::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
