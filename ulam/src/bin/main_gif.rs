@@ -5,7 +5,10 @@ use plotters::prelude::BitMapBackend;
 use plotters::prelude::Cartesian2d;
 use plotters::prelude::ChartBuilder;
 use plotters::prelude::DrawingArea;
+use plotters::prelude::TextStyle;
+use plotters::prelude::BLACK;
 use plotters::prelude::WHITE;
+use plotters::style::IntoFont;
 use std::fs::create_dir;
 use std::fs::create_dir_all;
 use std::io::stdout;
@@ -62,12 +65,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let gen = create_generator(&arg)?;
     let mut tile = create_tile(&arg, gen, &plotting_area)?;
 
+    let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
     let mut animation = Animation::new(&arg.animation)?;
     while let Some(result) = tile.draw_next() {
-        result?;
+        let n = result?;
 
         if animation.next() {
-            //            upper.draw_text(&format!("{}", arg.gp), &style, (20, 20))?;
+            upper.fill(&WHITE)?;
+            upper.draw_text(&format!("{}", arg.gp), &style, (20, 20))?;
+            upper.draw_text(&format!("n = {}", n), &style, (20, 50))?;
             root.present()
                 .expect(&format!("Failed to output file({})", file_path));
         }

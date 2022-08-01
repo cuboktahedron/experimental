@@ -72,7 +72,7 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
 }
 
 impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
-  fn draw_next(&mut self) -> Option<Result<(), Box<dyn std::error::Error>>> {
+  fn draw_next(&mut self) -> Option<Result<usize, Box<dyn std::error::Error>>> {
     if let Some((n, x, y, b)) = self.tile.next() {
       let coord1 = self.normalize(x, y);
       let coord2 = self.normalize(x + 1, y + 1);
@@ -96,7 +96,7 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
         }
 
         return match r {
-          Ok(_) => Some(Ok(())),
+          Ok(_) => Some(Ok(n)),
           Err(err) => Some(Err(Box::new(err))),
         };
       } else {
@@ -108,16 +108,16 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
             .draw(&Text::new(n.to_string(), (coord1.0, coord2.1), &style));
 
           return match r {
-            Ok(_) => Some(Ok(())),
+            Ok(_) => Some(Ok(n)),
             Err(err) => Some(Err(Box::new(err))),
           };
         }
+
+        Some(Ok(n))
       }
     } else {
       return None;
     }
-
-    Some(Ok(()))
   }
 }
 
