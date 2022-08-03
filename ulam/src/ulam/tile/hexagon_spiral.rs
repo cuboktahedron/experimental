@@ -40,7 +40,7 @@ impl<'a, 'b> HexagonSpiral<'a, 'b> {
     let vw = cycle as f64 * 2f64;
 
     let range = plotting_area.get_pixel_range().0;
-    let block = (range.end - range.start) as f64 / vw;
+    let block = (range.end - range.start - 100) as f64 / vw;
     HexagonSpiral {
       plotting_area,
       tile: HexagonSpiral::tile(gen),
@@ -122,7 +122,6 @@ impl<'a, 'b> Tile for HexagonSpiral<'a, 'b> {
             Err(err) => Some(Err(Box::new(err))),
           };
         }
-        
         Some(Ok(n))
       }
     } else {

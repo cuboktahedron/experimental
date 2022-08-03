@@ -1,6 +1,6 @@
-use crate::ulam::tile::types::LabelMode;
 use crate::ulam::generator::generator::Generator;
 use crate::ulam::tile::tile::Tile;
+use crate::ulam::tile::types::LabelMode;
 use plotters::coord::types::RangedCoordf64;
 use plotters::prelude::BitMapBackend;
 use plotters::prelude::Cartesian2d;
@@ -28,7 +28,7 @@ impl<'a, 'b> SquareSpiral<'a, 'b> {
     let n = gen.data_num();
     let vw = (n as f64).sqrt().ceil();
     let range = plotting_area.get_pixel_range().0;
-    let block = (range.end - range.start) as f64 / vw;
+    let block = (range.end - range.start - 100) as f64 / vw;
     SquareSpiral {
       plotting_area,
       tile: SquareSpiral::tile(gen),

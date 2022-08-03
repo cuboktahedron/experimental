@@ -28,7 +28,7 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
     let n = gen.data_num();
     let vw = (n as f64).sqrt().ceil();
     let range = plotting_area.get_pixel_range().0;
-    let block = (range.end - range.start) as f64 / vw;
+    let block = (range.end - range.start - 100) as f64 / vw;
     SquareZigzag {
       plotting_area,
       tile: SquareZigzag::tile(gen),
