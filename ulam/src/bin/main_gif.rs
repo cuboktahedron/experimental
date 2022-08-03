@@ -79,8 +79,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    root.present()
-        .expect(&format!("Failed to output file({})", file_path));
+    let wait_num = (arg.wait_after + arg.interval - 1) / arg.interval;
+
+    for _ in 0..wait_num {
+        root.present()
+            .expect(&format!("Failed to output file({})", file_path));
+    }
 
     Ok(())
 }
@@ -179,6 +183,9 @@ struct AppArg {
 
     #[clap(long, default_value = "1:1")]
     animation: String,
+
+    #[clap(long, default_value = "1000")]
+    wait_after: u32,
 }
 
 struct Animation {
