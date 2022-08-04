@@ -114,6 +114,10 @@ impl<'a, 'b> Tile for SquareSpiral<'a, 'b> {
       return None;
     }
   }
+
+  fn tile_info(&self) -> std::string::String {
+    format!("tile = square_spiral")
+  }
 }
 
 struct SquareSpiralTile<'a> {

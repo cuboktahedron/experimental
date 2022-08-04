@@ -119,6 +119,10 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
       return None;
     }
   }
+
+  fn tile_info(&self) -> std::string::String {
+    format!("tile = square_zigzag")
+  }
 }
 
 struct SquareZigzagTile<'a> {

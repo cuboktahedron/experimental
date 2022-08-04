@@ -14,7 +14,6 @@ use std::fs::create_dir_all;
 use std::io::stdout;
 use std::io::Write;
 use std::path::Path;
-use ulam::ulam::generator::fibonacci::FibonacciGenerator;
 use ulam::ulam::generator::generator::Generator;
 use ulam::ulam::generator::prime1s::Prime1sGenerator;
 use ulam::ulam::generator::prime3s::Prime3sGenerator;
@@ -62,22 +61,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_cartesian_2d(-size..size, -size..size)?;
     let plotting_area = chart.plotting_area();
 
-    let gen = create_generator(&arg)?;
-    let mut tile = create_tile(&arg, gen, &plotting_area)?;
+    let style = TextStyle::from(("sans-serif", 30).into_font()).color(&BLACK);
 
-    let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
+    let gen = create_generator(&arg)?;
+    let generator_info = gen.generator_info();
+
+    let mut tile = create_tile(&arg, gen, &plotting_area)?;
+    let tile_info = tile.tile_info();
+
     let mut animation = Animation::new(&arg.animation)?;
+    let mut n = 0;
     while let Some(result) = tile.draw_next() {
-        let n = result?;
+        n = result?;
 
         if animation.next() {
             upper.fill(&WHITE)?;
-            upper.draw_text(&format!("{}", arg.gp), &style, (20, 20))?;
-            upper.draw_text(&format!("n = {}", n), &style, (20, 50))?;
+            upper.draw_text(&generator_info, &style, (20, 10))?;
+            upper.draw_text(&tile_info, &style, (20, 40))?;
+            upper.draw_text(&format!("n = {}", n), &style, (20, 70))?;
             root.present()
                 .expect(&format!("Failed to output file({})", file_path));
         }
     }
+
+    upper.fill(&WHITE)?;
+    upper.draw_text(&generator_info, &style, (20, 10))?;
+    upper.draw_text(&tile_info, &style, (20, 40))?;
+    upper.draw_text(&format!("n = {}", n), &style, (20, 70))?;
+    root.present()
+        .expect(&format!("Failed to output file({})", file_path));
 
     let wait_num = (arg.wait_after + arg.interval - 1) / arg.interval;
 
@@ -90,11 +102,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::error::Error>> {
-    if arg.generator == "fibonacci" {
-        let gen = FibonacciGenerator::from_gp(&arg.gp)?;
-        return Ok(Box::new(gen));
-    }
-
     if arg.generator == "primes" {
         let gen = PrimesGenerator::from_gp(&arg.gp)?;
         return Ok(Box::new(gen));
@@ -181,7 +188,7 @@ struct AppArg {
     #[clap(long, default_value = "100")]
     interval: u32,
 
-    #[clap(long, default_value = "1:1")]
+    #[clap(long, default_value = "100:1")]
     animation: String,
 
     #[clap(long, default_value = "1000")]

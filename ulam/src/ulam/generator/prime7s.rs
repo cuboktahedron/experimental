@@ -35,6 +35,14 @@ impl Generator for Prime7sGenerator {
       None
     }
   }
+
+  fn generator_info(&self) -> std::string::String {
+    format!(
+      "generator = primes7, from = {}, to = {}",
+      self.gen.skip(),
+      self.gen.max()
+    )
+  }
 }
 
 #[cfg(test)]

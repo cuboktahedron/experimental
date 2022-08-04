@@ -128,6 +128,10 @@ impl<'a, 'b> Tile for HexagonSpiral<'a, 'b> {
       return None;
     }
   }
+
+  fn tile_info(&self) -> std::string::String {
+    format!("tile = hexagon_spiral")
+  }
 }
 
 struct HexagonSpiralTile<'a> {

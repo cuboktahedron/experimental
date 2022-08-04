@@ -46,6 +46,13 @@ impl Generator for SquareGenerator {
   fn next(&mut self) -> std::option::Option<(usize, bool)> {
     self.iter.next()
   }
+
+  fn generator_info(&self) -> std::string::String {
+    format!(
+      "generator = suares, from = {}, to = {}",
+      self.skip, self.max
+    )
+  }
 }
 
 pub struct SquaresOrNotIterator {

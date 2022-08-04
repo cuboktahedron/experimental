@@ -35,6 +35,14 @@ impl Generator for Prime3sGenerator {
       None
     }
   }
+
+  fn generator_info(&self) -> std::string::String {
+    format!(
+      "generator = primes3, from = {}, to = {}",
+      self.gen.skip(),
+      self.gen.max()
+    )
+  }
 }
 
 #[cfg(test)]

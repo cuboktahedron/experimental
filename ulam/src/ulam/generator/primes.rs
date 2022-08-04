@@ -27,9 +27,21 @@ impl PrimesGenerator {
       0
     };
 
-    let to: usize = if let Some(to) = to { to.parse()? } else { 10000 };
+    let to: usize = if let Some(to) = to {
+      to.parse()?
+    } else {
+      10000
+    };
 
     Ok(Self::new(to, from))
+  }
+
+  pub fn max(&self) -> usize {
+    self.max
+  }
+
+  pub fn skip(&self) -> usize {
+    self.skip
   }
 }
 
@@ -40,6 +52,13 @@ impl Generator for PrimesGenerator {
 
   fn next(&mut self) -> std::option::Option<(usize, bool)> {
     self.iter.next()
+  }
+
+  fn generator_info(&self) -> std::string::String {
+    format!(
+      "generator = primes, from = {}, to = {}",
+      self.skip, self.max
+    )
   }
 }
 

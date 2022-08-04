@@ -4,6 +4,7 @@ use core::iter::Skip;
 pub struct TimesGenerator {
   max: usize,
   skip: usize,
+  times_base: usize,
   iter: Skip<TimesOrNotIterator>,
 }
 
@@ -12,6 +13,7 @@ impl TimesGenerator {
     TimesGenerator {
       max: n,
       skip,
+      times_base,
       iter: TimesOrNotIterator::new(n, times_base).skip(skip),
     }
   }
@@ -51,6 +53,13 @@ impl Generator for TimesGenerator {
 
   fn next(&mut self) -> std::option::Option<(usize, bool)> {
     self.iter.next()
+  }
+
+  fn generator_info(&self) -> std::string::String {
+    format!(
+      "generator = times, from = {}, to = {} times = {}",
+      self.skip, self.max, self.times_base
+    )
   }
 }
 

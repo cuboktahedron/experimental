@@ -1,16 +1,4 @@
 use clap::Parser;
-use ulam::ulam::generator::fibonacci::FibonacciGenerator;
-use ulam::ulam::generator::generator::Generator;
-use ulam::ulam::generator::prime1s::Prime1sGenerator;
-use ulam::ulam::generator::prime3s::Prime3sGenerator;
-use ulam::ulam::generator::prime7s::Prime7sGenerator;
-use ulam::ulam::generator::primes::PrimesGenerator;
-use ulam::ulam::generator::squares::SquareGenerator;
-use ulam::ulam::generator::times::TimesGenerator;
-use ulam::ulam::tile::hexagon_spiral::HexagonSpiral;
-use ulam::ulam::tile::square_spiral::SquareSpiral;
-use ulam::ulam::tile::square_zigzag::SquareZigzag;
-use ulam::ulam::tile::tile::Tile;
 use plotters::coord::types::RangedCoordf64;
 use plotters::drawing::IntoDrawingArea;
 use plotters::prelude::BitMapBackend;
@@ -24,11 +12,22 @@ use plotters::style::IntoFont;
 use std::fs::create_dir;
 use std::fs::create_dir_all;
 use std::path::Path;
+use ulam::ulam::generator::generator::Generator;
+use ulam::ulam::generator::prime1s::Prime1sGenerator;
+use ulam::ulam::generator::prime3s::Prime3sGenerator;
+use ulam::ulam::generator::prime7s::Prime7sGenerator;
+use ulam::ulam::generator::primes::PrimesGenerator;
+use ulam::ulam::generator::squares::SquareGenerator;
+use ulam::ulam::generator::times::TimesGenerator;
+use ulam::ulam::tile::hexagon_spiral::HexagonSpiral;
+use ulam::ulam::tile::square_spiral::SquareSpiral;
+use ulam::ulam::tile::square_zigzag::SquareZigzag;
+use ulam::ulam::tile::tile::Tile;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let arg: AppArg = AppArg::parse();
 
-  let style = TextStyle::from(("sans-serif", 40).into_font()).color(&BLACK);
+  let style = TextStyle::from(("sans-serif", 30).into_font()).color(&BLACK);
 
   if !Path::new("output").is_dir() {
     create_dir("output")?;
@@ -62,13 +61,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let plotting_area = chart.plotting_area();
 
   let gen = create_generator(&arg)?;
+  upper.draw_text(&format!("{}", gen.generator_info()), &style, (20, 10))?;
+
   let mut tile = create_tile(&arg, gen, &plotting_area)?;
+  upper.draw_text(&format!("{}", tile.tile_info()), &style, (20, 50))?;
 
   while let Some(result) = tile.draw_next() {
     result?;
   }
 
-  upper.draw_text(&format!("{}", arg.gp), &style, (20, 20))?;
   root
     .present()
     .expect(&format!("Failed to output file({})", file_path));
@@ -77,11 +78,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn create_generator(arg: &AppArg) -> Result<Box<dyn Generator>, Box<dyn std::error::Error>> {
-  if arg.generator == "fibonacci" {
-    let gen = FibonacciGenerator::from_gp(&arg.gp)?;
-    return Ok(Box::new(gen));
-  }
-
   if arg.generator == "primes" {
     let gen = PrimesGenerator::from_gp(&arg.gp)?;
     return Ok(Box::new(gen));
