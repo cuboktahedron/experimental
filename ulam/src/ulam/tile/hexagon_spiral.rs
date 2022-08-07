@@ -131,7 +131,7 @@ impl<'a, 'b> Tile for HexagonSpiral<'a, 'b> {
   }
 
   fn tile_info(&self) -> std::string::String {
-    format!("tile = hexagon_spiral")
+    format!("tile = spiral6")
   }
 }
 

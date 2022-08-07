@@ -122,7 +122,7 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
   }
 
   fn tile_info(&self) -> std::string::String {
-    format!("tile = square_zigzag")
+    format!("tile = zigzag4")
   }
 }
 
