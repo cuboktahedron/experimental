@@ -29,7 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file_path = if let Some(ref file) = arg.output {
         format!("output/{}", file)
     } else {
-        let gp = format!("{}:{}", arg.from, arg.to);
+        let gp = format!("{}_{}", arg.from, arg.to);
         format!("output/times-{}-{}-{}.gif", arg.tile, arg.image_size, gp)
     };
 

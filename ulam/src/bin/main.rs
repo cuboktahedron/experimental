@@ -38,7 +38,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   } else {
     format!(
       "output/{}-{}-{}-{}.png",
-      arg.generator, arg.tile, arg.image_size, arg.gp
+      arg.generator,
+      arg.tile,
+      arg.image_size,
+      arg.gp.replace(":", "_")
     )
   };
 
