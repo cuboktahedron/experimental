@@ -25,6 +25,7 @@ use ulam::ulam::tile::hexagon_spiral::HexagonSpiral;
 use ulam::ulam::tile::square_spiral::SquareSpiral;
 use ulam::ulam::tile::square_zigzag::SquareZigzag;
 use ulam::ulam::tile::tile::Tile;
+use ulam::ulam::tile::tile::MARGIN;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arg: AppArg = AppArg::parse();
@@ -53,11 +54,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into_drawing_area();
     root.fill(&WHITE)?;
 
-    let (upper, lower) = root.split_vertically(100);
+    let (upper, lower) = root.split_vertically(MARGIN as i32);
 
-    let size = ((arg.image_size - 100) / 2) as f64;
+    let size = ((arg.image_size - MARGIN as u32) / 2) as f64;
     let chart = ChartBuilder::on(&lower)
-        .margin(20)
+        .margin_left(MARGIN as f64 * 0.75)
+        .margin_right(MARGIN as f64 * 0.75)
+        .margin_bottom(MARGIN as u32 / 2)
         .build_cartesian_2d(-size..size, -size..size)?;
     let plotting_area = chart.plotting_area();
 
@@ -76,18 +79,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         if animation.next() {
             upper.fill(&WHITE)?;
-            upper.draw_text(&generator_info, &style, (20, 10))?;
-            upper.draw_text(&tile_info, &style, (20, 40))?;
-            upper.draw_text(&format!("n = {}", n), &style, (20, 70))?;
+            upper.draw_text(&generator_info, &style, (15, 10))?;
+            upper.draw_text(&tile_info, &style, (15, 35))?;
+            upper.draw_text(&format!("n = {}", n), &style, (15, 60))?;
             root.present()
                 .expect(&format!("Failed to output file({})", file_path));
         }
     }
 
     upper.fill(&WHITE)?;
-    upper.draw_text(&generator_info, &style, (20, 10))?;
-    upper.draw_text(&tile_info, &style, (20, 40))?;
-    upper.draw_text(&format!("n = {}", n), &style, (20, 70))?;
+    upper.draw_text(&generator_info, &style, (15, 10))?;
+    upper.draw_text(&tile_info, &style, (15, 35))?;
+    upper.draw_text(&format!("n = {}", n), &style, (15, 60))?;
     root.present()
         .expect(&format!("Failed to output file({})", file_path));
 
@@ -97,6 +100,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         root.present()
             .expect(&format!("Failed to output file({})", file_path));
     }
+
+    println!("");
 
     Ok(())
 }
@@ -173,7 +178,7 @@ struct AppArg {
     #[clap(short, long, default_value = "spiral4")]
     tile: String,
 
-    #[clap(long, default_value = "0")]
+    #[clap(long, default_value = "1")]
     gp: String,
 
     #[clap(long, default_value = "0")]
@@ -185,7 +190,7 @@ struct AppArg {
     #[clap(short, long, default_value = "800")]
     image_size: u32,
 
-    #[clap(long, default_value = "100")]
+    #[clap(long, default_value = "500")]
     interval: u32,
 
     #[clap(long, default_value = "100:1")]

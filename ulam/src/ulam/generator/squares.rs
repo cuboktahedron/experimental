@@ -25,13 +25,13 @@ impl SquareGenerator {
     let from: usize = if let Some(from) = from {
       from.parse()?
     } else {
-      0
+      1
     };
 
     let to: usize = if let Some(to) = to {
       to.parse()?
     } else {
-      10000
+      1000
     };
 
     Ok(Self::new(to, from))

@@ -23,6 +23,7 @@ use ulam::ulam::tile::hexagon_spiral::HexagonSpiral;
 use ulam::ulam::tile::square_spiral::SquareSpiral;
 use ulam::ulam::tile::square_zigzag::SquareZigzag;
 use ulam::ulam::tile::tile::Tile;
+use ulam::ulam::tile::tile::MARGIN;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let arg: AppArg = AppArg::parse();
@@ -52,11 +53,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let root = BitMapBackend::new(&file_path, (arg.image_size, arg.image_size)).into_drawing_area();
   root.fill(&WHITE)?;
 
-  let (upper, lower) = root.split_vertically(100);
+  let (upper, lower) = root.split_vertically(MARGIN as u32);
 
-  let size = ((arg.image_size - 100) / 2) as f64;
+  let size = ((arg.image_size - MARGIN as u32) / 2) as f64;
   let chart = ChartBuilder::on(&lower)
-    .margin(20)
+    .margin_left(MARGIN as f64 * 0.75)
+    .margin_right(MARGIN as f64 * 0.75)
+    .margin_bottom(MARGIN as u32 / 2)
     .build_cartesian_2d(-size..size, -size..size)?;
   let plotting_area = chart.plotting_area();
 
@@ -149,7 +152,7 @@ struct AppArg {
   #[clap(short, long, default_value = "spiral4")]
   tile: String,
 
-  #[clap(long, default_value = "0")]
+  #[clap(long, default_value = "1")]
   gp: String,
 
   #[clap(long, default_value = "0")]

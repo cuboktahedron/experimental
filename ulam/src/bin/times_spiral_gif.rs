@@ -18,6 +18,7 @@ use ulam::ulam::tile::hexagon_spiral::HexagonSpiral;
 use ulam::ulam::tile::square_spiral::SquareSpiral;
 use ulam::ulam::tile::square_zigzag::SquareZigzag;
 use ulam::ulam::tile::tile::Tile;
+use ulam::ulam::tile::tile::MARGIN;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arg: AppArg = AppArg::parse();
@@ -28,10 +29,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file_path = if let Some(ref file) = arg.output {
         format!("output/{}", file)
     } else {
-        format!(
-            "output/times-{}-{}-{}.gif",
-            arg.tile, arg.image_size, arg.gp
-        )
+        let gp = format!("{}:{}", arg.from, arg.to);
+        format!("output/times-{}-{}-{}.gif", arg.tile, arg.image_size, gp)
     };
 
     let path = Path::new(&file_path);
@@ -46,11 +45,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into_drawing_area();
     root.fill(&WHITE)?;
 
-    let (upper, lower) = root.split_vertically(100);
+    let (upper, lower) = root.split_vertically(MARGIN as i32);
 
-    let size = ((arg.image_size - 100) / 2) as f64;
+    let size = ((arg.image_size - MARGIN as u32) / 2) as f64;
     let chart = ChartBuilder::on(&lower)
-        .margin(20)
+        .margin_left(MARGIN as f64 * 0.75)
+        .margin_right(MARGIN as f64 * 0.75)
+        .margin_bottom(MARGIN as u32 / 2)
         .build_cartesian_2d(-size..size, -size..size)?;
     let plotting_area = chart.plotting_area();
 
@@ -59,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for i in arg.times_from..=arg.times_to {
         root.fill(&WHITE)?;
 
-        let gp = format!("{}:{}", arg.gp, i);
+        let gp = format!("{}:{}:{}", arg.from, arg.to, i);
 
         let gen = Box::new(TimesGenerator::from_gp(&gp)?);
         let generator_info = gen.generator_info();
@@ -124,10 +125,13 @@ struct AppArg {
     tile: String,
 
     #[clap(long, default_value = "0")]
-    gp: String,
-
-    #[clap(long, default_value = "0")]
     tp: String,
+
+    #[clap(long, default_value = "1")]
+    from: u32,
+
+    #[clap(long, default_value = "1000")]
+    to: u32,
 
     #[clap(long, default_value = "1")]
     times_from: u32,
@@ -141,7 +145,7 @@ struct AppArg {
     #[clap(short, long, default_value = "800")]
     image_size: u32,
 
-    #[clap(long, default_value = "100")]
+    #[clap(long, default_value = "500")]
     interval: u32,
 
     #[clap(long, default_value = "1000")]

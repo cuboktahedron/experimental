@@ -1,5 +1,6 @@
 use crate::ulam::generator::generator::Generator;
 use crate::ulam::tile::tile::Tile;
+use crate::ulam::tile::tile::MARGIN;
 use crate::ulam::tile::types::LabelMode;
 use plotters::coord::types::RangedCoordf64;
 use plotters::prelude::BitMapBackend;
@@ -28,7 +29,7 @@ impl<'a, 'b> SquareZigzag<'a, 'b> {
     let n = gen.data_num();
     let vw = (n as f64).sqrt().ceil();
     let range = plotting_area.get_pixel_range().0;
-    let block = (range.end - range.start - 100) as f64 / vw;
+    let block = (range.end - range.start - MARGIN as i32) as f64 / vw;
     SquareZigzag {
       plotting_area,
       tile: SquareZigzag::tile(gen),
@@ -88,7 +89,7 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
         };
 
         if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyPositive {
-          let font_size = (self.block / 2.0).min(100f64).max(8.0);
+          let font_size = (self.block / 2.0).min(MARGIN as f64).max(8.0);
           let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
           r = self
             .plotting_area
@@ -101,7 +102,7 @@ impl<'a, 'b> Tile for SquareZigzag<'a, 'b> {
         };
       } else {
         if self.label_mode == LabelMode::All || self.label_mode == LabelMode::OnlyNegative {
-          let font_size = (self.block / 2.0).min(100f64).max(8.0);
+          let font_size = (self.block / 2.0).min(MARGIN as f64).max(8.0);
           let style = TextStyle::from(("sans-serif", font_size).into_font()).color(&BLACK);
           let r = self
             .plotting_area
